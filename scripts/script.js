@@ -35,28 +35,26 @@ let todoList = {
 };
 
 let handlers = {
-  addTodo(){
+  addTodo(e){
     let addTodoTextInput = document.getElementById('addTodoTextInput');
-    todoList.addTodo(addTodoTextInput.value);
-    addTodoTextInput.value = '';
-    view.displayTodos();
+    if(e.keyCode === 13 && addTodoTextInput.value.length>0){
+      todoList.addTodo(addTodoTextInput.value);
+      addTodoTextInput.value = '';
+      view.displayTodos();
+    }
   },
-  changeTodo(){
-    let changeTodoPositionInput = document.getElementById('changeTodoPositionInput');
+  changeTodo(position){
     let changeTodoTextInput = document.getElementById('changeTodoTextInput');
-    todoList.changeTodo(changeTodoPositionInput.valueAsNumber, changeTodoTextInput.value);
+    todoList.changeTodo(position, changeTodoTextInput.value);
     changeTodoTextInput.value = '';
-    changeTodoPositionInput.valueAsNumber = '';
     view.displayTodos();
   },
   deleteTodo(position){
     todoList.deleteTodo(position);
     view.displayTodos();
   },
-  toggleCompleted(){
-    let toggleCompletedPositionInput = document.getElementById('toggleCompletedPositionInput');
-    todoList.toggleCompleted(toggleCompletedPositionInput.valueAsNumber);
-    toggleCompletedPositionInput.valueAsNumber = '';
+  toggleCompleted(position){
+    todoList.toggleCompleted(position);
     view.displayTodos();
   },
   toggleAll(){
@@ -70,7 +68,6 @@ let view = {
   displayTodos(){
     let todosUl = document.querySelector('ul');
     todosUl.innerHTML = '';
-
     todoList.todos.forEach(function(todo, position){
       let todoLi = document.createElement('li');
       let todoTextWithCompletion = '';
@@ -80,15 +77,30 @@ let view = {
         todoTextWithCompletion='() '+todo.todoText;
       }
       todoLi.id = position;
+      todosUl.className = 'shadow card-design';
       todoLi.textContent = todoTextWithCompletion;
+      todoLi.appendChild(this.createEditButton());
       todoLi.appendChild(this.createDeleteButton());
+      todoLi.appendChild(this.createToggleButton());
       todosUl.appendChild(todoLi);
     }, this);
 
   },
+  createEditButton(){
+    let editButton = document.createElement('button');
+    editButton.textContent = 'Edit';
+    editButton.className = 'editButton';
+    return editButton;
+  },
+  createToggleButton(){
+    let toggleButton = document.createElement('button');
+    toggleButton.textContent = 'Toggle Button';
+    toggleButton.className = 'toggleButton';
+    return toggleButton;
+  },
   createDeleteButton(){
     let deleteButton = document.createElement('button');
-    deleteButton.textContent = 'delete';
+    deleteButton.textContent = 'Delete';
     deleteButton.className = 'deleteButton';
     return deleteButton;
   },
@@ -96,9 +108,13 @@ let view = {
     let todosUl = document.querySelector('ul');
     todosUl.addEventListener('click',function(event){
       let elementClicked = event.target;
-      console.log(elementClicked);
       if(elementClicked.className === 'deleteButton'){
         handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+      }else if(elementClicked.className === "editButton"){
+        handlers.changeTodo(parseInt(elementClicked.parentNode.id));
+      }else if(elementClicked.className ==='toggleButton'){
+        console.log(elementClicked.parentNode);
+        handlers.toggleCompleted(parseInt(elementClicked.parentNode.id));
       }
     });
   }
