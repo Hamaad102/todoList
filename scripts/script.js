@@ -34,6 +34,8 @@ let todoList = {
   }
 };
 
+let initialVal;
+
 let handlers = {
   addTodo(e){
     let addTodoTextInput = document.getElementById('addTodoTextInput');
@@ -43,11 +45,20 @@ let handlers = {
       view.displayTodos();
     }
   },
-  changeTodo(position){
-    let changeTodoTextInput = document.getElementById('changeTodoTextInput');
-    todoList.changeTodo(position, changeTodoTextInput.value);
-    changeTodoTextInput.value = '';
+  changeTodo(position, content){
+    todoList.todos[position] = initialVal;
+    todoList.todos[position].todoText = content;
     view.displayTodos();
+    // let initialValue = todoList.todos[position].todoText;
+    // content.innerHTML = '<input id="temp" onkeypress="this.pushEditTodo(event)">';
+    // document.getElementById('temp').value = initialValue;
+    // document.getElementById('temp').value = initialValue;
+    //
+    //
+    // let changeTodoTextInput = document.getElementById('changeTodoTextInput');
+    // todoList.changeTodo(position, changeTodoTextInput.value);
+    // changeTodoTextInput.value = '';
+    // view.displayTodos();
   },
   deleteTodo(position){
     todoList.deleteTodo(position);
@@ -63,28 +74,28 @@ let handlers = {
   }
 };
 
+let edit = false;
 
 let view = {
   displayTodos(){
     let todosUl = document.querySelector('ul');
+    let complete = document.createElement('i');
     todosUl.innerHTML = '';
     todoList.todos.forEach(function(todo, position){
       let todoLi = document.createElement('li');
       let todoTextWithCompletion = '';
       if(todo.completed===true){
-        todoTextWithCompletion='(x) '+todo.todoText;
+        todoTextWithCompletion= '<i class="fa fa-check-circle-o"></i> '+ todo.todoText;
       }else{
-        todoTextWithCompletion='() '+todo.todoText;
+        todoTextWithCompletion='<i class="fa fa-circle-o"></i> '+todo.todoText;
       }
       todoLi.id = position;
       todosUl.className = 'shadow card-design';
-      todoLi.textContent = todoTextWithCompletion;
+      todoLi.innerHTML = todoTextWithCompletion;
       todoLi.appendChild(this.createEditButton());
       todoLi.appendChild(this.createDeleteButton());
-      todoLi.appendChild(this.createToggleButton());
       todosUl.appendChild(todoLi);
     }, this);
-
   },
   createEditButton(){
     let editButton = document.createElement('button');
@@ -92,15 +103,9 @@ let view = {
     editButton.className = 'editButton';
     return editButton;
   },
-  createToggleButton(){
-    let toggleButton = document.createElement('button');
-    toggleButton.textContent = 'Toggle Button';
-    toggleButton.className = 'toggleButton';
-    return toggleButton;
-  },
   createDeleteButton(){
     let deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Delete';
+    deleteButton.textContent = 'X';
     deleteButton.className = 'deleteButton';
     return deleteButton;
   },
@@ -109,12 +114,25 @@ let view = {
     todosUl.addEventListener('click',function(event){
       let elementClicked = event.target;
       if(elementClicked.className === 'deleteButton'){
+        if(todoList.todos.length === 1){
+          document.querySelector('ul').classList.remove("shadow");
+        }
         handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
       }else if(elementClicked.className === "editButton"){
-        handlers.changeTodo(parseInt(elementClicked.parentNode.id));
-      }else if(elementClicked.className ==='toggleButton'){
-        console.log(elementClicked.parentNode);
+        initialVal = todoList.todos[parseInt(elementClicked.parentNode.id)];
+        let initialValue = todoList.todos[parseInt(elementClicked.parentNode.id)].todoText;
+        elementClicked.parentNode.innerHTML = '<input id="temp">';
+        document.getElementById('temp').value = initialValue;
+        edit = true;
+      }else if(elementClicked.className === 'fa fa-circle-o' || elementClicked.className === "fa fa-check-circle-o"){
         handlers.toggleCompleted(parseInt(elementClicked.parentNode.id));
+      }else if(edit===true){
+        let temp = document.getElementById('temp');
+        temp.addEventListener('keydown', function(event){
+          if(event.keyCode === 13 && document.getElementById('temp').value.length>0){
+            handlers.changeTodo(parseInt(elementClicked.parentNode.id), temp.value);
+          }
+        });
       }
     });
   }
