@@ -116,6 +116,7 @@ button:focus {
     width: 63vw; } }
 @media only screen and (max-width: 400px) {
   #list input {
-    width: 50vw; } }
+    width: 50vw;
+    font-size: 12px; } }
 
 /*# sourceMappingURL=style.css.map */
