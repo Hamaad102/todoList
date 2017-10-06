@@ -1,3 +1,9 @@
+let initialVal;
+let timer;
+let editingInProgress = false;
+let preEdit = false;
+let edit = false;
+
 let todoList = {
   todos: [],
   addTodo(todoText){
@@ -34,31 +40,21 @@ let todoList = {
   }
 };
 
-let initialVal;
-
 let handlers = {
   addTodo(e){
     let addTodoTextInput = document.getElementById('addTodoTextInput');
     if(e.keyCode === 13 && addTodoTextInput.value.length>0){
+      editingInProgress = false;
       todoList.addTodo(addTodoTextInput.value);
       addTodoTextInput.value = '';
       view.displayTodos();
     }
   },
   changeTodo(position, content){
+    editingInProgress = false;
     todoList.todos[position] = initialVal;
     todoList.todos[position].todoText = content;
     view.displayTodos();
-    // let initialValue = todoList.todos[position].todoText;
-    // content.innerHTML = '<input id="temp" onkeypress="this.pushEditTodo(event)">';
-    // document.getElementById('temp').value = initialValue;
-    // document.getElementById('temp').value = initialValue;
-    //
-    //
-    // let changeTodoTextInput = document.getElementById('changeTodoTextInput');
-    // todoList.changeTodo(position, changeTodoTextInput.value);
-    // changeTodoTextInput.value = '';
-    // view.displayTodos();
   },
   deleteTodo(position){
     todoList.deleteTodo(position);
@@ -69,12 +65,11 @@ let handlers = {
     view.displayTodos();
   },
   toggleAll(){
+    editingInProgress = false;
     todoList.toggleAll();
     view.displayTodos();
   }
 };
-
-let edit = false;
 
 let view = {
   displayTodos(){
@@ -85,55 +80,80 @@ let view = {
       let todoLi = document.createElement('li');
       let todoTextWithCompletion = '';
       if(todo.completed===true){
-        todoTextWithCompletion= '<i class="fa fa-check-circle-o"></i> '+ todo.todoText;
+        todoTextWithCompletion= '<span class="strike">'+todo.todoText+'</span>';
       }else{
-        todoTextWithCompletion='<i class="fa fa-circle-o"></i> '+todo.todoText;
+        todoTextWithCompletion= todo.todoText;
       }
       todoLi.id = position;
+      todoLi.className = 'toggle';
       todosUl.className = 'shadow card-design';
-      todoLi.innerHTML = todoTextWithCompletion;
-      todoLi.appendChild(this.createEditButton());
       todoLi.appendChild(this.createDeleteButton());
+      todoLi.innerHTML += ' ' + todoTextWithCompletion;
       todosUl.appendChild(todoLi);
     }, this);
   },
-  createEditButton(){
-    let editButton = document.createElement('button');
-    editButton.textContent = 'Edit';
-    editButton.className = 'editButton';
-    return editButton;
-  },
   createDeleteButton(){
     let deleteButton = document.createElement('button');
-    deleteButton.textContent = 'X';
+    deleteButton.textContent = 'x';
     deleteButton.className = 'deleteButton';
     return deleteButton;
   },
   setUpEventListeners(){
     let todosUl = document.querySelector('ul');
+
     todosUl.addEventListener('click',function(event){
       let elementClicked = event.target;
       if(elementClicked.className === 'deleteButton'){
+        editingInProgress = false;
         if(todoList.todos.length === 1){
           document.querySelector('ul').classList.remove("shadow");
         }
         handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
-      }else if(elementClicked.className === "editButton"){
-        initialVal = todoList.todos[parseInt(elementClicked.parentNode.id)];
-        let initialValue = todoList.todos[parseInt(elementClicked.parentNode.id)].todoText;
-        elementClicked.parentNode.innerHTML = '<input id="temp">';
+      }else if(preEdit === true){
+        initialVal = todoList.todos[parseInt(elementClicked.id)];
+        let initialValue = todoList.todos[parseInt(elementClicked.id)].todoText;
+        elementClicked.innerHTML = '<input id="temp">';
         document.getElementById('temp').value = initialValue;
         edit = true;
-      }else if(elementClicked.className === 'fa fa-circle-o' || elementClicked.className === "fa fa-check-circle-o"){
-        handlers.toggleCompleted(parseInt(elementClicked.parentNode.id));
+        preEdit = false;
+      }else if(elementClicked.className === 'toggle' || elementClicked.className === 'toggle strike'){
+        editingInProgress = false;
+        handlers.toggleCompleted(parseInt(elementClicked.id));
       }else if(edit===true){
         let temp = document.getElementById('temp');
         temp.addEventListener('keydown', function(event){
           if(event.keyCode === 13 && document.getElementById('temp').value.length>0){
-            handlers.changeTodo(parseInt(elementClicked.parentNode.id), temp.value);
+            edit = false;
+            handlers.changeTodo(parseInt(elementClicked.id), temp.value);
           }
         });
       }
+    });
+
+    todosUl.addEventListener('mousedown', function(){
+      if(editingInProgress === false){
+        timer = setTimeout(function(){
+          preEdit = true;
+          editingInProgress = true;
+        }, 500);
+      }
+    });
+
+    todosUl.addEventListener('touchstart', function(){
+      if(editingInProgress === false){
+        timer = setTimeout(function(){
+          preEdit = true;
+          editingInProgress = true;
+        }, 500);
+      }
+    });
+
+    todosUl.addEventListener('mouseup', function(){
+      clearTimeout(timer);
+    });
+
+    todosUl.addEventListener('touchend', function(){
+      clearTimeout(timer);
     });
   }
 };

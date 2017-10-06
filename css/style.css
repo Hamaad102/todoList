@@ -38,6 +38,20 @@ h1 {
   text-overflow: clip;
   background: white; }
 
+#temp {
+  color: #9068be;
+  border: 1px solid white;
+  -webkit-box-sizing: content-box;
+  font-family: "Quicksand", sans-serif;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  text-indent: 10px; }
+
+button:focus {
+  outline: 0 !important; }
+
 #items {
   padding-top: 25px; }
   #items li {
@@ -46,12 +60,59 @@ h1 {
     list-style: none;
     padding: 15px 76px 15px 40px;
     word-wrap: break-word;
-    border-bottom: 1px solid #6ed3cf; }
+    border-bottom: 1px solid #6ed3cf;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    padding-left: 60px;
+    font-size: 20px; }
+  #items .deleteButton {
+    color: #ff0000;
+    font-size: 20px;
+    border: none;
+    text-decoration: none;
+    background: white;
+    opacity: 0.5;
+    position: absolute;
+    left: 335px; }
+  #items .deleteButton:hover {
+    opacity: 1; }
 
 .card-design {
   background: white;
   width: 518px;
   border-radius: 2px;
   margin: 0 auto; }
+
+.strike {
+  text-decoration: line-through !important;
+  opacity: 0.5 !important; }
+
+@media only screen and (max-width: 1199px) {
+  #items .deleteButton {
+    left: 245px; } }
+#instruct {
+  font-family: "Quicksand", sans-serif;
+  font-size: 10px;
+  padding-top: 24px; }
+
+@media only screen and (max-width: 991px) {
+  #items .deleteButton {
+    left: 125px; } }
+@media only screen and (max-width: 767px) {
+  #items .deleteButton {
+    left: 35px; } }
+@media only screen and (max-width: 550px) {
+  .container h1 {
+    font-size: 75px !important; }
+
+  .card-design {
+    width: 85vw; }
+
+  #items .deleteButton {
+    left: 12vw; }
+
+  #list input {
+    width: 63vw; } }
 
 /*# sourceMappingURL=style.css.map */
