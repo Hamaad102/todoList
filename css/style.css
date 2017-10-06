@@ -114,5 +114,8 @@ button:focus {
 
   #list input {
     width: 63vw; } }
+@media only screen and (max-width: 400px) {
+  #list input {
+    width: 50vw; } }
 
 /*# sourceMappingURL=style.css.map */
